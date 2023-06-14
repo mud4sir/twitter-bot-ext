@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Testing Twitter Commenter",
+  "version": "1.0",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab", "tabs", "storage"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

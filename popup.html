@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Twitter Commentor</title>
+    <style>
+      *,
+      *:after,
+      *:before {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: transparent;
+      }
+
+      label {
+        font-size: 15px;
+      }
+
+      a {
+        color: white;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      .account-form {
+        display: none;
+      }
+
+      .twitter-ext {
+        padding: 10px;
+        background: linear-gradient(to bottom, #1da1f2, #1877f2);
+        color: white;
+        width: 260px;
+      }
+
+      .twitter-ext h3 {
+        margin: 0 0 15px 0;
+        font-size: 18px;
+        line-height: 1.25;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 15px;
+      }
+
+      .twitter-ext label {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0 0 7px 0;
+      }
+      .twitter-ext select,
+      .twitter-ext input {
+        border: 1px solid #fff;
+        padding: 7px;
+        font-size: 14px;
+        border-radius: 5px;
+        background-color: transparent;
+        color: #fff;
+        outline: none !important;
+        width: 100%;
+      }
+      .twitter-ext input::placeholder {
+        color: #fff;
+      }
+      .twitter-ext select * {
+        color: #000;
+        padding: 5px;
+      }
+      .twitter-ext button {
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 25px;
+        padding: 10px 15px;
+        background-color: rgb(0, 0, 0, 0.8);
+        color: #fff;
+        text-align: center;
+        line-height: 1;
+        outline: none;
+        box-shadow: none;
+        display: inline-flex;
+        align-items: center;
+        border: none;
+        cursor: pointer;
+        min-width: 110px;
+        text-align: center;
+        justify-content: center;
+      }
+      .d-flex {
+        display: flex;
+      }
+      .between {
+        justify-content: space-between;
+      }
+      .v-center {
+        align-items: center;
+      }
+      .flex-wrap {
+        flex-wrap: wrap;
+      }
+      .gap-15 {
+        gap: 15px;
+      }
+      .d-none {
+        display: none;
+      }
+    </style>
+    <script src="popup.js"></script>
+  </head>
+  <body>
+    <div class="twitter-ext">
+      <h3>Twitter Commentor</h3>
+      <div class="form-group">
+        <select id="accountSelect">
+          <option value="">Select Account</option>
+        </select>
+      </div>
+      <div class="d-flex between flex-wrap gap-15">
+        <button id="getDataButton">Start</button>
+        <button id="enterDelayBtn" class="delay-btn">Enter Delay</button>
+        <div id="delayBtnMain" class="d-none">
+          <label for="minDelayMain">Min:</label>
+          <input
+            type="number"
+            id="minDelayMain"
+            min="1"
+            placeholder="Min seconds"
+            required
+          />
+          <label for="maxDelayMain">Max:</label>
+          <input
+            type="number"
+            id="maxDelayMain"
+            min="1"
+            placeholder="Max seconds"
+            required
+          />
+        </div>
+        <button id="accountMgtButton">Account Mgt.</button>
+      </div>
+
+      <div class="account-form">
+        <div class="form-group">
+          <!-- <label for="accountName">Account Name:</label>
+          <input type="text" id="accountName" required /> -->
+          <select id="accountAdd">
+            <option value="" disabled selected>Select Account</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="minDelay">Min:</label>
+          <input
+            type="number"
+            id="minDelay"
+            min="1"
+            placeholder="Min seconds"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="maxDelay">Max:</label>
+          <input
+            type="number"
+            id="maxDelay"
+            min="1"
+            placeholder="Max seconds"
+            required
+          />
+        </div>
+        <div class="d-flex between v-center">
+          <button id="saveAccountButton">Save</button>
+          <button class="deleteAccountButton" id="deleteAccountButton">
+            Delete
+          </button>
+        </div>
+        <br />
+        <div class="d-flex between v-center">
+          <button class="back-button" id="backButton">&lt; Back</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
