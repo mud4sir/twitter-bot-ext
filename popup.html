@@ -29,14 +29,23 @@
         display: none;
       }
 
-      .twitter-ext {
+      .twitter-ext-connect {
         padding: 10px;
         background: linear-gradient(to bottom, #1da1f2, #1877f2);
         color: white;
         width: 260px;
       }
 
-      .twitter-ext h3 {
+      .twitter-ext {
+        display: none;
+        padding: 10px;
+        background: linear-gradient(to bottom, #1da1f2, #1877f2);
+        color: white;
+        width: 260px;
+      }
+
+      .twitter-ext h3,
+      .twitter-ext-connect h3 {
         margin: 0 0 15px 0;
         font-size: 18px;
         line-height: 1.25;
@@ -48,13 +57,15 @@
         margin-bottom: 15px;
       }
 
-      .twitter-ext label {
+      .twitter-ext label,
+      .twitter-ext-connect label {
         font-size: 14px;
         font-weight: 600;
-        margin: 0 0 7px 0;
+        margin: 0 0 10px 0;
       }
       .twitter-ext select,
-      .twitter-ext input {
+      .twitter-ext input,
+      .twitter-ext-connect input {
         border: 1px solid #fff;
         padding: 7px;
         font-size: 14px;
@@ -71,7 +82,8 @@
         color: #000;
         padding: 5px;
       }
-      .twitter-ext button {
+      .twitter-ext button,
+      .twitter-ext-connect button {
         font-size: 14px;
         font-weight: 600;
         border-radius: 25px;
@@ -112,74 +124,91 @@
     <script src="popup.js"></script>
   </head>
   <body>
-    <div class="twitter-ext">
-      <h3>Twitter Commentor</h3>
-      <div class="form-group">
-        <select id="accountSelect">
-          <option value="">Select Account</option>
-        </select>
-      </div>
-      <div class="d-flex between flex-wrap gap-15">
-        <button id="getDataButton">Start</button>
-        <button id="enterDelayBtn" class="delay-btn">Enter Delay</button>
-        <div id="delayBtnMain" class="d-none">
-          <label for="minDelayMain">Min:</label>
-          <input
-            type="number"
-            id="minDelayMain"
-            min="1"
-            placeholder="Min seconds"
-            required
-          />
-          <label for="maxDelayMain">Max:</label>
-          <input
-            type="number"
-            id="maxDelayMain"
-            min="1"
-            placeholder="Max seconds"
-            required
-          />
+    <div>
+      <div class="twitter-ext-connect" id="connectionPage">
+        <h3>Twitter Commentor</h3>
+        <label for="linkToSheet">Api key</label>
+        <input
+          id="linkToSheet"
+          type="text"
+          placeholder="paste link to your sheet here"
+        />
+        <br />
+        <br />
+        <div class="d-flex between">
+          <button id="connectSheetBtn">Save</button>
+          <button id="backMainPageBtn">&lt; main page</button>
         </div>
-        <button id="accountMgtButton">Account Mgt.</button>
       </div>
 
-      <div class="account-form">
+      <div class="twitter-ext" id="mainPage">
+        <h3>Twitter Commentor</h3>
         <div class="form-group">
-          <!-- <label for="accountName">Account Name:</label>
-          <input type="text" id="accountName" required /> -->
-          <select id="accountAdd">
-            <option value="" disabled selected>Select Account</option>
+          <select id="accountSelect">
+            <option value="">Select Account</option>
           </select>
         </div>
-        <div class="form-group">
-          <label for="minDelay">Min:</label>
-          <input
-            type="number"
-            id="minDelay"
-            min="1"
-            placeholder="Min seconds"
-            required
-          />
+        <div class="d-flex between flex-wrap gap-15">
+          <button id="getDataButton">Start</button>
+          <button id="enterDelayBtn" class="delay-btn">Enter Delay</button>
+          <div id="delayBtnMain" class="d-none">
+            <label for="minDelayMain">Min:</label>
+            <input
+              type="number"
+              id="minDelayMain"
+              min="1"
+              placeholder="Min seconds"
+              required
+            />
+            <label for="maxDelayMain">Max:</label>
+            <input
+              type="number"
+              id="maxDelayMain"
+              min="1"
+              placeholder="Max seconds"
+              required
+            />
+          </div>
+          <button id="accountMgtButton">Acc Mgt.</button>
+          <button id="connectionBtn">Change Api</button>
         </div>
-        <div class="form-group">
-          <label for="maxDelay">Max:</label>
-          <input
-            type="number"
-            id="maxDelay"
-            min="1"
-            placeholder="Max seconds"
-            required
-          />
-        </div>
-        <div class="d-flex between v-center">
-          <button id="saveAccountButton">Save</button>
-          <button class="deleteAccountButton" id="deleteAccountButton">
-            Delete
-          </button>
-        </div>
-        <br />
-        <div class="d-flex between v-center">
-          <button class="back-button" id="backButton">&lt; Back</button>
+
+        <div class="account-form">
+          <div class="form-group">
+            <select id="accountAdd">
+              <option value="" disabled selected>Select Account</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="minDelay">Min:</label>
+            <input
+              type="number"
+              id="minDelay"
+              min="1"
+              placeholder="Min seconds"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="maxDelay">Max:</label>
+            <input
+              type="number"
+              id="maxDelay"
+              min="1"
+              placeholder="Max seconds"
+              required
+            />
+          </div>
+          <div class="d-flex between v-center">
+            <button id="saveAccountButton">Save</button>
+            <button class="deleteAccountButton" id="deleteAccountButton">
+              Delete
+            </button>
+          </div>
+          <br />
+          <div class="d-flex between v-center">
+            <button class="back-button" id="backButton">&lt; Back</button>
+          </div>
         </div>
       </div>
     </div>
