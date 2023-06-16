@@ -4,8 +4,8 @@ function openLinksSequentially(rows, minDelay, maxDelay) {
   var tabUpdated = false;
 
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    if (tabs.length > 0) {
-      currentTabId = tabs[0].id;
+    if (tabs?.length > 0) {
+      currentTabId = tabs[0]?.id;
       navigateToNextLink();
     }
   });
@@ -26,11 +26,11 @@ function openLinksSequentially(rows, minDelay, maxDelay) {
   });
 
   function navigateToNextLink() {
-    if (index >= rows.length) {
+    if (index >= rows?.length) {
       return;
     }
 
-    var link = rows[index].link;
+    var link = rows[index]?.link;
 
     chrome.tabs.update(currentTabId, { url: link }, function () {
       tabUpdated = true;
