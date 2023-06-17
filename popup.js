@@ -84,6 +84,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   const displayConnectionPage = () => {
     connectionPage.style.display = "block";
+    gotoMainPageBtn.style.display = "block";
     mainPage.style.display = "none";
   };
 
