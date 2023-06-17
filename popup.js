@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   await chrome.storage.local.get(`${windowId}`, async (result) => {
     const apiKeyLocalStorage = await result[`${windowId}`];
     accountsUrl = apiKeyLocalStorage;
-    if (apiKeyLocalStorage?.trim() !== "") {
+    if (apiKeyLocalStorage && apiKeyLocalStorage?.trim() !== "") {
       displayMainPage();
     }
   });
