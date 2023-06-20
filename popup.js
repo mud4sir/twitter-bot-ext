@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const gotoMainPageBtn = document.getElementById("backMainPageBtn");
   const connectionBtn = document.getElementById("connectionBtn");
   const connectSheetBtn = document.getElementById("connectSheetBtn");
+  const accordion = document.getElementById('accordion');
 
   // els
   const delayBtnsDiv = document.getElementById("delayBtnMain");
@@ -107,6 +108,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   //////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
   // Event Listeners
+
+  attachClickEventListner(accordion, () => {toggleAccordion(1)});
 
   connectSheetBtn.addEventListener("click", async () => {
     const link = linkToSheet.value;
@@ -373,6 +376,15 @@ document.addEventListener("DOMContentLoaded", async function () {
         option.dataset.minValue = account?.minDelay;
         optgroup.appendChild(option);
       });
+    }
+  }
+
+  function toggleAccordion(section) {
+    var content = document.getElementsByClassName('accordion-content')[section - 1];
+    if (content.style.display === 'block') {
+      content.style.display = 'none';
+    } else {
+      content.style.display = 'block';
     }
   }
 });
