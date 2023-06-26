@@ -1,6 +1,7 @@
 // constants
 let accountsUrl;
 const windowId = chrome.windows.WINDOW_ID_CURRENT;
+// let continueProcessingLinks = false;
 
 document.addEventListener("DOMContentLoaded", async function () {
   // see if api key exists in local storage
@@ -71,17 +72,23 @@ document.addEventListener("DOMContentLoaded", async function () {
     connectionBtn.style.display = "none";
   };
 
-  const displayMainPage = () => {
-    connectionPage.style.display = "none";
-    accountForm.style.display = "none";
-    mainPage.style.display = "block";
-    accountSelect.style.display = "block";
-    accountMgtButton.style.display = "block";
-    getDataButton.style.display = "block";
-    enterDelayBtn.style.display = "block";
-    connectionBtn.style.display = "block";
+  const displayMainPage = async () => {
+    await chrome.storage.local.get(`${windowId}`, async (result) => {
+      const apiKeyLocalStorage = await result[`${windowId}`];
+      accountsUrl = apiKeyLocalStorage;
+      if (apiKeyLocalStorage && apiKeyLocalStorage?.trim() !== "") {
+        connectionPage.style.display = "none";
+        accountForm.style.display = "none";
+        mainPage.style.display = "block";
+        accountSelect.style.display = "block";
+        accountMgtButton.style.display = "block";
+        getDataButton.style.display = "block";
+        enterDelayBtn.style.display = "block";
+        connectionBtn.style.display = "block";
+      }
+    });
   };
-
+  
   const displayConnectionPage = () => {
     connectionPage.style.display = "block";
     gotoMainPageBtn.style.display = "block";
@@ -102,6 +109,57 @@ document.addEventListener("DOMContentLoaded", async function () {
       alert(message);
     });
   }
+
+async function getCurrentTab() {
+  let queryOptions = { active: true, currentWindow: true };
+  let [tab] = await chrome.tabs.query(queryOptions);
+  return tab;
+}
+
+async function startOpenLinks() {
+  const selectedAccount = accountSelect?.value;
+  getDataButton.textContent = 'Start';
+  // continueProcessingLinks = !continueProcessingLinks;
+  // if (continueProcessingLinks) {
+  //   getDataButton.textContent = 'Stop';
+  // }
+  if (selectedAccount === "") {
+    alert("Please select an account.");
+    return;
+  }
+
+  const { minValue, maxValue } = [...accountSelect.options].map((el) => {
+    return { minValue: el.dataset.minValue, maxValue: el.dataset.maxValue };
+  })[1];
+
+  const customDelay = false;
+  let minDelay = null;
+  let maxDelay = null;
+
+  minDelay = parseInt(minDelayInputMain.value) || parseInt(minValue);
+  maxDelay = parseInt(maxDelayInputMain.value) || parseInt(maxValue);
+
+  if (isNaN(minDelay) || isNaN(maxDelay)) {
+    alert("Please enter valid delay values.");
+    return;
+  }
+
+  let apiURL = accountsUrl + "?accName=" + selectedAccount;
+  if (customDelay) {
+    apiURL += "&minDelay=" + minDelay + "&maxDelay=" + maxDelay;
+  }
+  const { data } = await getAccounts(apiURL);
+  const { id: currentTabId } = await getCurrentTab();
+
+  chrome.runtime.sendMessage({
+    action: "startOpenLinks",
+    currentTabId,
+    rows: data,
+    minDelay,
+    maxDelay,
+    // continueProcessingLinks,
+  });
+}
 
   //////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////
@@ -146,43 +204,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
-  getDataButton.addEventListener("click", async function () {
-    const selectedAccount = accountSelect?.value;
-
-    if (selectedAccount === "") {
-      alert("Please select an account.");
-      return;
-    }
-
-    const { minValue, maxValue } = [...accountSelect.options].map((el) => {
-      return { minValue: el.dataset.minValue, maxValue: el.dataset.maxValue };
-    })[1];
-
-    var customDelay = false;
-    var minDelay = null;
-    var maxDelay = null;
-
-    minDelay = parseInt(minDelayInputMain.value) || parseInt(minValue);
-    maxDelay = parseInt(maxDelayInputMain.value) || parseInt(maxValue);
-
-    if (isNaN(minDelay) || isNaN(maxDelay)) {
-      alert("Please enter valid delay values.");
-      return;
-    }
-
-    let apiURL = accountsUrl + "?accName=" + selectedAccount;
-    if (customDelay) {
-      apiURL += "&minDelay=" + minDelay + "&maxDelay=" + maxDelay;
-    }
-
-    const { data } = await getAccounts(apiURL);
-    chrome.runtime.sendMessage({
-      action: "startOpenLinks",
-      rows: data,
-      minDelay,
-      maxDelay,
-    });
-  });
+  getDataButton.addEventListener("click", startOpenLinks);
 
   attachClickEventListner(accountMgtButton, async function () {
     displayAccountManagementPage();
@@ -197,7 +219,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const { data: accountsList } = await getAccounts(accountsUrl);
     accountsList?.shift();
-    addSelectedAccount(accountsList, savedAccountsList);
+    addSelectedAccount(accountsList || [], savedAccountsList);
   });
 
   attachClickEventListner(saveAccountButton, function () {
@@ -267,9 +289,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     chrome.storage.local.get(["accounts"], function (result) {
-      var accounts = result.accounts || [];
-      console.log("accounts", accounts);
-      var index = accounts.findIndex(function (account) {
+      const accounts = result.accounts || [];
+      let index = accounts.findIndex(function (account) {
         return account.name === accountName;
       });
 
@@ -292,7 +313,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   async function updateAccountSelect(accounts) {
-    console.log("accounts", accounts);
     accountSelect.innerHTML =
       '<option disabled selected value="">Select an account</option>';
     accounts.forEach(function (account) {
@@ -311,7 +331,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // TODO: refactoring needs to be here
 
     const uniqueUnsavedAccounts = Object.values(
-      accounts.reduce((acc, obj) => {
+      accounts?.reduce((acc, obj) => {
         const name = obj["account name"].trim();
         if (!acc[name]) {
           acc[name] = obj;
@@ -331,7 +351,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     const optgroup = document.createElement("optgroup");
     optgroup.label = "----- Available Accounts ------";
     accountAdd.appendChild(optgroup);
-    console.log("unsavedAccounts", unsavedAccounts);
     if (unsavedAccounts.length <= 0) {
       const option = document.createElement("option");
       option.textContent = "no accounts available";
@@ -375,4 +394,13 @@ document.addEventListener("DOMContentLoaded", async function () {
       });
     }
   }
+  
+  // listen to messages from background script
+  chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+    if (message.action === 'tweetLoaded') {
+      const {link, comment, tabId} = message.data;
+      chrome.runtime.sendMessage({ action: 'tweetPageLoaded', data: {comment, link, tabId} });
+    }
+  });
+
 });
