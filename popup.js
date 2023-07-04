@@ -1,7 +1,7 @@
 // constants
 let accountsUrl;
 const windowId = chrome.windows.WINDOW_ID_CURRENT;
-// let continueProcessingLinks = false;
+let continueProcessingLinks = false;
 
 document.addEventListener("DOMContentLoaded", async function () {
   // see if api key exists in local storage
@@ -110,6 +110,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
+
 async function getCurrentTab() {
   let queryOptions = { active: true, currentWindow: true };
   let [tab] = await chrome.tabs.query(queryOptions);
@@ -119,10 +120,10 @@ async function getCurrentTab() {
 async function startOpenLinks() {
   const selectedAccount = accountSelect?.value;
   getDataButton.textContent = 'Start';
-  // continueProcessingLinks = !continueProcessingLinks;
-  // if (continueProcessingLinks) {
-  //   getDataButton.textContent = 'Stop';
-  // }
+  continueProcessingLinks = !continueProcessingLinks;
+  if (continueProcessingLinks) {
+    getDataButton.textContent = 'Stop';
+  }
   if (selectedAccount === "") {
     alert("Please select an account.");
     return;
@@ -150,14 +151,13 @@ async function startOpenLinks() {
   }
   const { data } = await getAccounts(apiURL);
   const { id: currentTabId } = await getCurrentTab();
-
   chrome.runtime.sendMessage({
     action: "startOpenLinks",
     currentTabId,
     rows: data,
     minDelay,
     maxDelay,
-    // continueProcessingLinks,
+    continueProcessingLinks,
   });
 }
 
@@ -204,7 +204,7 @@ async function startOpenLinks() {
     }
   });
 
-  getDataButton.addEventListener("click", startOpenLinks);
+  attachClickEventListner(getDataButton, startOpenLinks);
 
   attachClickEventListner(accountMgtButton, async function () {
     displayAccountManagementPage();
@@ -397,9 +397,10 @@ async function startOpenLinks() {
   
   // listen to messages from background script
   chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+    console.log('message', message);
     if (message.action === 'tweetLoaded') {
-      const {link, comment, tabId} = message.data;
-      chrome.runtime.sendMessage({ action: 'tweetPageLoaded', data: {comment, link, tabId} });
+      const {link, comment, currentTabId} = message.data;
+      chrome.runtime.sendMessage({ action: 'tweetPageLoaded', data: {comment, link, currentTabId} });
     }
   });
 
