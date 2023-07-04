@@ -1,65 +1,8 @@
 
-const START_PROCESSING_LINK_TIME = 2000;
+// CONSTANTS
+const START_PROCESSING_LINK_TIME_DELAY = 300000; // 5 mins
 const DEFAULT_MIN_DELAY = 5;
 const DEFAULT_MAX_DELAY = 10;
-
-// var tabUpdated = false;
-// var index = 0;
-// let minimumDelay;
-// let maximumDelay;
-// async function openLinksSequentially(rows,currentTabId, minDelay, maxDelay) {
-//   minimumDelay = minDelay;
-//   maximumDelay = maxDelay;
-//   const delay = getRandomDelay(minDelay, maxDelay);
-//   console.log('delay', delay);
-//   setTimeout(()=>{
-//     navigateToNextLink(rows, currentTabId, index);
-//   }, delay * 1000);
-  
-//   chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
-//     if (
-//       tabId === currentTabId &&
-//       changeInfo.status === "complete" &&
-//       tabUpdated
-//     ) {
-//       tabUpdated = false;
-//       const delay = getRandomDelay(minimumDelay || DEFAULT_MIN_DELAY, maximumDelay || DEFAULT_MAX_DELAY);
-//       setTimeout(function () {
-//         index++;
-//         navigateToNextLink(rows, currentTabId, index);
-//       }, delay * 1000);
-
-//       const link = rows[index]?.link;
-//       const comment = rows[index]?.comment;
-//       chrome.runtime.sendMessage({ action: 'tweetLoaded', data: {comment, link, tabId} });
-//     }
-//   });
-
-// }
-
-// function navigateToNextLink(rows, currentTabId, index) {
-//   if (index >= rows?.length) {
-//     return;
-//   }
-
-//   const link = rows[index]?.link;
-//   console.log('link', link);
-//   chrome.tabs.update(currentTabId, { url: link }, function () {
-//     tabUpdated = true;
-//   });
-// }
-
-
-// function getRandomDelay(min, max) {
-//   if (min && max) {
-//     return Math.floor(Math.random() * (max - min + 1)) + min;
-//   } else if (min) {
-//     return min;
-//   } else {
-//     return 0;
-//   }
-// }
-
 
 let minimumDelay;
 let maximumDelay;
@@ -117,20 +60,18 @@ function openLinksSequentially(rows,tabID, minDelay, maxDelay) {
   }
 }
 
-function run (rows,currentTabId, minDelay, maxDelay, condition) {
+function startProcessingLinksContinously (rows,currentTabId, minDelay, maxDelay, condition) {
 
   if (!openLinksTimer) {
-    // openLinksSequentially(rows, currentTabId, minDelay, maxDelay);
-    console.log('no timer');
+    openLinksSequentially(rows, currentTabId, minDelay, maxDelay);
   }
   
   let bool = condition;
   if (bool) {
     openLinksTimer = setTimeout(()=>{
-      // openLinksSequentially(rows,currentTabId, minDelay, maxDelay);
-      console.log('yes timer');
-      run(rows,currentTabId, minDelay, maxDelay, bool);
-    }, 10000);
+      openLinksSequentially(rows,currentTabId, minDelay, maxDelay);
+      startProcessingLinksContinously(rows,currentTabId, minDelay, maxDelay, bool);
+    }, START_PROCESSING_LINK_TIME_DELAY);
   } else {
     clearTimeout(openLinksTimer);
   }
@@ -149,7 +90,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
   if (message.action === "startOpenLinks") {
     const { rows,currentTabId, minDelay, maxDelay, continueProcessingLinks } = message;
-    console.log('continueProcessingLinks', continueProcessingLinks);
-    run(rows,currentTabId, minDelay, maxDelay, continueProcessingLinks);
+    startProcessingLinksContinously(rows,currentTabId, minDelay, maxDelay, continueProcessingLinks);
   }
 });
