@@ -395,12 +395,46 @@ async function startOpenLinks() {
     }
   }
   
+  async function updateLinkFromApi(url, prevLink) {
+    let row;
+    const { data } = await getAccounts(url);
+    let recentLink = data[0]?.link;
+    
+    while(recentLink.trim() === prevLink.trim()){
+      const { data } = await getAccounts(url);
+      row = data;
+      recentLink = data[0]?.link;
+    }
+    return row;
+  };
+
   // listen to messages from background script
-  chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-    console.log('message', message);
-    if (message.action === 'tweetLoaded') {
+  chrome.runtime.onMessage.addListener(async function(message, sender, sendResponse) {
+    const { action } = message;
+    
+    if (action === 'tweetLoaded') {
       const {link, comment, currentTabId} = message.data;
       chrome.runtime.sendMessage({ action: 'tweetPageLoaded', data: {comment, link, currentTabId} });
+    }
+
+    if (action === 'linkMatchFound') {
+      chrome.runtime.sendMessage({action: 'duplicateLinkFound'});
+      const { maximumDelay, minimumDelay, accountName, prevProcessedLink } = message.data;
+      const apiEndpoint = accountsUrl + "?accName=" + accountName;
+      const data = await updateLinkFromApi(apiEndpoint, prevProcessedLink);
+      if (data) {
+
+        const { id: currentTabId } = await getCurrentTab();
+
+        chrome.runtime.sendMessage({
+          action: "startOpenLinks",
+          currentTabId,
+          rows: data,
+          minDelay: minimumDelay,
+          maxDelay: maximumDelay,
+          continueProcessingLinks,
+        });
+      }
     }
   });
 

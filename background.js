@@ -1,9 +1,10 @@
 
 // CONSTANTS
-const START_PROCESSING_LINK_TIME_DELAY = 300000; // 5 mins
+const START_PROCESSING_LINK_TIME_DELAY = 5000; // 5 mins
 const DEFAULT_MIN_DELAY = 5;
 const DEFAULT_MAX_DELAY = 10;
 
+let prevProcessedLink;
 let minimumDelay;
 let maximumDelay;
 let openLinksTimer;
@@ -40,13 +41,25 @@ function openLinksSequentially(rows,tabID, minDelay, maxDelay) {
       return;
     }
 
+    const accountName = rows[index]?.['account name'] || rows[index]?.accountName;
     const link = rows[index]?.link;
     const comment = rows[index]?.comment;
+    
+    if (link === prevProcessedLink) {
+      chrome.runtime.sendMessage({
+        action: 'linkMatchFound',
+        data: { minimumDelay, maximumDelay, accountName, prevProcessedLink }
+      });
+      return;
+    }
+
     chrome.runtime.sendMessage({ action: 'tweetLoaded', data: {comment, link, currentTabId} });
 
     chrome.tabs.update(currentTabId, { url: link }, function () {
       tabUpdated = true;
     });
+
+    prevProcessedLink = link;
   }
 
   function getRandomDelay(min, max) {
@@ -65,6 +78,13 @@ function startProcessingLinksContinously (rows,currentTabId, minDelay, maxDelay,
   if (!openLinksTimer) {
     openLinksSequentially(rows, currentTabId, minDelay, maxDelay);
   }
+
+  chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
+    if (message.action === 'duplicateLinkFound') {
+      clearTimeout(openLinksTimer);
+      return;
+    }
+  });
   
   let bool = condition;
   if (bool) {
@@ -78,8 +98,8 @@ function startProcessingLinksContinously (rows,currentTabId, minDelay, maxDelay,
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  console.log('message from background module', message);
-  if (message.action === 'tweetPageLoaded') {
+  const { action } = message;
+  if (action === 'tweetPageLoaded') {
     const { currentTabId } = message.data;
     chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
       if (changeInfo.status === 'complete') {
@@ -88,7 +108,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     });
   }
 
-  if (message.action === "startOpenLinks") {
+  if (action === "startOpenLinks") {
     const { rows,currentTabId, minDelay, maxDelay, continueProcessingLinks } = message;
     startProcessingLinksContinously(rows,currentTabId, minDelay, maxDelay, continueProcessingLinks);
   }
