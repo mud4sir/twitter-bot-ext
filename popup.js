@@ -63,6 +63,59 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   const compare = (a, b) => a === b;
 
+  function updateAccountLinks (savedAccounts, updatedAccounts) {
+    return savedAccounts.filter((item, index) => {
+         if (updatedAccounts[index]) {
+             if (item.link !== updatedAccounts[index].link) {
+             item.link = updatedAccounts[index].link;
+            }
+          }
+          return item;
+      });
+  }
+  
+  function updateSavedAccounts (savedAccounts, allAccounts) {
+    const updatedAccounts = [];
+    for (let i = 0; i < savedAccounts.length; i++) {
+      const savedAc = savedAccounts[i];
+  
+      for (let j = 0; j < allAccounts.length; j++) {
+        const allAc = allAccounts[j];
+  
+        if (savedAc['account name'].trim() === allAc['account name'].trim()) {
+          if (savedAc.link !== allAc.link) {
+            updatedAccounts.push(allAc);
+          }
+        }
+      }
+    }
+      
+    if (updatedAccounts.length > 0) {
+      return updateAccountLinks(savedAccounts, updatedAccounts);
+    }
+    return savedAccounts;
+  }
+  
+  function hasLinkMatched(savedAccounts, allAccounts) {
+    let match = true;
+    for (let i = 0; i < savedAccounts.length; i++) {
+      const savedAc = savedAccounts[i];
+      
+      for (let j = 0; j < allAccounts.length; j++) {
+        const allAc = allAccounts[j];
+        if (savedAc['account name'].trim() === allAc['account name'].trim()) {
+          if (savedAc.link !== allAc.link) {
+            match = false;
+            break;
+          }
+        }
+      }
+    }
+  
+    return match;
+  }
+
+
   const displayAccountManagementPage = () => {
     accountForm.style.display = "block";
     accountSelect.style.display = "none";
@@ -106,7 +159,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     data[`${key}`] = value;
 
     chrome.storage.local.set(data, () => {
-      alert(message);
+      if (message) {
+        alert(message);
+      }
     });
   }
 
@@ -118,47 +173,35 @@ async function getCurrentTab() {
 }
 
 async function startOpenLinks() {
-  const selectedAccount = accountSelect?.value;
-  getDataButton.textContent = 'Start';
-  continueProcessingLinks = !continueProcessingLinks;
-  if (continueProcessingLinks) {
-    getDataButton.textContent = 'Stop';
-  }
-  if (selectedAccount === "") {
-    alert("Please select an account.");
-    return;
-  }
+  const minDelay = parseInt(minDelayInputMain.value);
+  const maxDelay = parseInt(maxDelayInputMain.value);
 
-  const { minValue, maxValue } = [...accountSelect.options].map((el) => {
-    return { minValue: el.dataset.minValue, maxValue: el.dataset.maxValue };
-  })[1];
+  await chrome.storage.local.get(["accounts"], async function (result) {
+    const savedData = result.accounts || [];
+    const { id: currentTabId } = await getCurrentTab();
+    
+    if (savedData.length === 0) {
+      alert('no saved account found');
+      return;
+    }
 
-  const customDelay = false;
-  let minDelay = null;
-  let maxDelay = null;
+    getDataButton.textContent = 'Start';
+    continueProcessingLinks = !continueProcessingLinks;
+    if (continueProcessingLinks) {
+      getDataButton.textContent = 'Stop';
+    }
 
-  minDelay = parseInt(minDelayInputMain.value) || parseInt(minValue);
-  maxDelay = parseInt(maxDelayInputMain.value) || parseInt(maxValue);
-
-  if (isNaN(minDelay) || isNaN(maxDelay)) {
-    alert("Please enter valid delay values.");
-    return;
-  }
-
-  let apiURL = accountsUrl + "?accName=" + selectedAccount;
-  if (customDelay) {
-    apiURL += "&minDelay=" + minDelay + "&maxDelay=" + maxDelay;
-  }
-  const { data } = await getAccounts(apiURL);
-  const { id: currentTabId } = await getCurrentTab();
-  chrome.runtime.sendMessage({
-    action: "startOpenLinks",
-    currentTabId,
-    rows: data,
-    minDelay,
-    maxDelay,
-    continueProcessingLinks,
+    chrome.runtime.sendMessage({
+      action: "startOpenLinks",
+      currentTabId,
+      rows: savedData,
+      minDelay,
+      maxDelay,
+      continueProcessingLinks,
+    });
+  
   });
+  
 }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -224,6 +267,11 @@ async function startOpenLinks() {
 
   attachClickEventListner(saveAccountButton, function () {
     const accountName = accountAdd.value.trim();
+    
+    const selectElement = document.getElementById('accountAdd');
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const link = selectedOption.getAttribute('data-link') || '';
+    const comment = selectedOption.getAttribute('data-comment') || '';
     var minDelay = parseInt(minDelayInput.value);
     var maxDelay = parseInt(maxDelayInput.value);
 
@@ -246,7 +294,7 @@ async function startOpenLinks() {
       var accounts = result.accounts || [];
 
       var existingAccount = accounts.find(function (account) {
-        return account.name === accountName;
+        return account.name || account['account name'] === accountName;
       });
 
       if (existingAccount) {
@@ -255,9 +303,11 @@ async function startOpenLinks() {
       }
 
       accounts.push({
-        name: accountName,
+        'account name': accountName,
         minDelay: minDelay,
         maxDelay: maxDelay,
+        link,
+        comment,
       });
 
       saveDataLocalStorage(
@@ -291,7 +341,7 @@ async function startOpenLinks() {
     chrome.storage.local.get(["accounts"], function (result) {
       const accounts = result.accounts || [];
       let index = accounts.findIndex(function (account) {
-        return account.name === accountName;
+        return account.name || account['account name'] === accountName;
       });
 
       if (index !== -1) {
@@ -314,7 +364,7 @@ async function startOpenLinks() {
 
   async function updateAccountSelect(accounts) {
     accountSelect.innerHTML =
-      '<option disabled selected value="">Select an account</option>';
+      '<option disabled selected value="">Added Accounts</option>';
     accounts.forEach(function (account) {
       // TODO: this functionality can be exported to a function
       // it's repeatitive
@@ -323,6 +373,8 @@ async function startOpenLinks() {
       option.textContent = account?.name || account["account name"];
       option.dataset.maxValue = account?.maxDelay;
       option.dataset.minValue = account?.minDelay;
+      option.dataset.link = account?.link;
+      option.dataset.comment = account?.comment;
       accountSelect.appendChild(option);
     });
   }
@@ -343,7 +395,7 @@ async function startOpenLinks() {
     const unsavedAccounts = uniqueUnsavedAccounts.filter(
       (item1) =>
         !saveAccounts.some((item2) =>
-          compare(item1["account name"].trim(), item2?.name.trim())
+          compare(item1["account name"]?.trim(), item2['account name']?.trim())
         )
     );
 
@@ -364,6 +416,8 @@ async function startOpenLinks() {
         option.textContent = account?.name || account["account name"];
         option.dataset.maxValue = account?.maxDelay;
         option.dataset.minValue = account?.minDelay;
+        option.dataset.link = account?.link;
+        option.dataset.comment = account?.comment;
         optgroup.appendChild(option);
       });
     }
@@ -390,22 +444,31 @@ async function startOpenLinks() {
         option.textContent = account?.name || account["account name"];
         option.dataset.maxValue = account?.maxDelay;
         option.dataset.minValue = account?.minDelay;
+        option.dataset.link = account?.link;
+        option.dataset.comment = account?.comment;
         optgroup.appendChild(option);
       });
     }
   }
   
-  async function updateLinkFromApi(url, prevLink) {
-    let row;
+  async function updateLinkFromApi(url, savedData) {
     const { data } = await getAccounts(url);
-    let recentLink = data[0]?.link;
-    
-    while(recentLink.trim() === prevLink.trim()){
+    data?.shift();
+
+    let matchFound = hasLinkMatched(savedData, data);
+    while(matchFound){
       const { data } = await getAccounts(url);
-      row = data;
-      recentLink = data[0]?.link;
+      data?.shift();
+      matchFound = hasLinkMatched(savedData, data);
     }
-    return row;
+    
+    if (!matchFound) {
+      const { data } = await getAccounts(url);
+      data?.shift();
+      const updatedAccounts = updateSavedAccounts(savedData, data);
+      saveDataLocalStorage("accounts", updatedAccounts);
+      return updatedAccounts;
+    }
   };
 
   // listen to messages from background script
@@ -419,22 +482,25 @@ async function startOpenLinks() {
 
     if (action === 'linkMatchFound') {
       chrome.runtime.sendMessage({action: 'duplicateLinkFound'});
-      const { maximumDelay, minimumDelay, accountName, prevProcessedLink } = message.data;
-      const apiEndpoint = accountsUrl + "?accName=" + accountName;
-      const data = await updateLinkFromApi(apiEndpoint, prevProcessedLink);
-      if (data) {
 
-        const { id: currentTabId } = await getCurrentTab();
+      const { maximumDelay, minimumDelay } = message.data;
+      await chrome.storage.local.get(["accounts"], async function (result) {
+        const savedData = result.accounts || [];
+        const data = await updateLinkFromApi(accountsUrl, savedData);
 
-        chrome.runtime.sendMessage({
-          action: "startOpenLinks",
-          currentTabId,
-          rows: data,
-          minDelay: minimumDelay,
-          maxDelay: maximumDelay,
-          continueProcessingLinks,
-        });
-      }
+        if (data) {
+          const { id: currentTabId } = await getCurrentTab();
+          
+          chrome.runtime.sendMessage({
+            action: "startOpenLinks",
+            currentTabId,
+            rows: data,
+            minDelay: minimumDelay,
+            maxDelay: maximumDelay,
+            continueProcessingLinks,
+          });
+        }
+      });
     }
   });
 
