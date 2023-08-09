@@ -23,20 +23,17 @@ document.addEventListener("DOMContentLoaded", async function () {
       const allAcc = data?.data;
       allAcc.shift();
       allAccounts = allAcc;
-      console.log(allAccounts);
       document.getElementById('totalAccounts').textContent = `${allAccounts.length} accounts`;
     }
   });
 
   // btns
   const getDataButton = document.getElementById("getDataButton");
-  // const accountSelect = document.getElementById("accountSelect");
   const accountAddTxt = document.getElementById("accountAdd");
   const accountMgtButton = document.getElementById("accountMgtButton");
   const saveAccountButton = document.getElementById("saveAccountButton");
   const backButton = document.getElementById("backButton");
   const deleteAccountButton = document.getElementById("deleteAccountButton");
-  // const enterDelayBtn = document.getElementById("enterDelayBtn");
   const gotoMainPageBtn = document.getElementById("backMainPageBtn");
   const connectionBtn = document.getElementById("connectionBtn");
   const connectSheetBtn = document.getElementById("connectSheetBtn");
@@ -45,7 +42,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   const addAccountsBtn = document.getElementById("addAccountsBtn");
 
   // els
-  // const delayBtnsDiv = document.getElementById("delayBtnMain");
   const accountForm = document.querySelector(".account-form");
   const minDelayInput = document.getElementById("minDelay");
   const maxDelayInput = document.getElementById("maxDelay");
@@ -142,11 +138,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   const displayAccountManagementPage = () => {
     accountForm.style.display = "block";
     accountManagementTitle.style.display = 'block';
-    // accountSelect.style.display = "none";
     accountMgtButton.style.display = "none";
     totalAccounts.style.display = 'none';
     getDataButton.style.display = "none";
-    // enterDelayBtn.style.display = "none";
     connectionBtn.style.display = "none";
     processStatus.style.display = 'none';
   };
@@ -160,11 +154,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         connectionPage.style.display = "none";
         accountForm.style.display = "none";
         mainPage.style.display = "block";
-        // accountSelect.style.display = "block";
         accountMgtButton.style.display = "block";
         totalAccounts.style.display = 'block';
         getDataButton.style.display = "block";
-        // enterDelayBtn.style.display = "block";
         connectionBtn.style.display = "block";
         processStatus.style.display = 'block';
       }
@@ -264,23 +256,6 @@ async function startOpenLinks() {
   attachClickEventListner(connectionBtn, displayConnectionPage);
   attachClickEventListner(gotoMainPageBtn, displayMainPage);
 
-  // enterDelayBtn.addEventListener("click", () => {
-  //   if (
-  //     enterDelayBtn.innerText === "Enter Delay" &&
-  //     delayBtnsDiv.style.display === "none"
-  //   ) {
-  //     enterDelayBtn.innerText = "Cancel";
-  //     delayBtnsDiv.style.display = "block";
-  //   } else {
-  //     enterDelayBtn.innerText = "Enter Delay";
-  //     delayBtnsDiv.style.display = "none";
-
-  //     // TODO: reset input min/max fn
-  //     minDelayInputMain.value = "";
-  //     maxDelayInputMain.value = "";
-  //   }
-  // });
-
   attachClickEventListner(getDataButton, startOpenLinks);
 
   attachClickEventListner(accountMgtButton, async function () {
@@ -299,9 +274,6 @@ async function startOpenLinks() {
     chrome.storage.local.get(["accounts"], function (result) {
       savedAccountsList = result.accounts || [];
     });
-    
-    // addSelectedAccount(accountsList || [], savedAccountsList);
-    // displayAddedAccounts(savedAccountsList);
   });
 
   attachClickEventListner(accountsBtn, async function() {
@@ -309,34 +281,9 @@ async function startOpenLinks() {
   
     const {
       accountList,
-      // activeAcTitle,
-      // activeAcIcon,
-      // activeAcWrapper,
     } = getAccountsListNodes();
 
     if (accountListLoaded) {
-
-    //   if (addAcBtnClicked) {
-    //     const accounts = document.querySelectorAll('#addAcCheckboxWrap');
-    //     accounts.forEach(el => {
-    //       el.parentNode.removeChild(el);
-    //     });
-    //     addAcBtnClicked = !addAcBtnClicked;
-    //   };
-
-    //   const elems = document.querySelectorAll('#checkboxWrapContainer > #checkboxWrap');
-    //   elems.forEach(el => {
-    //     el.parentNode.removeChild(el);
-    //   });
-    //   activeAcTitle.parentNode.removeChild(activeAcTitle);
-    //   activeAcIcon.parentNode.removeChild(activeAcIcon);
-    //   activeAcWrapper.parentNode.removeChild(activeAcWrapper)
-
-    //   addAccountsBtn.style.display = 'none';
-
-    //   accountListLoaded = false;
-    //   enableButton(accountsBtn);
-
       hideAccountsList();
       return;
     }
@@ -405,44 +352,13 @@ async function startOpenLinks() {
     addAccountsBtn.classList.remove('d-none');
     addAccountsBtn.style.display ='flex';
     addAccountsBtn.style.marginLeft ='-7px';
-
-    // saveAccounts.forEach(function (account) {
-      //     const option = document.createElement("option");
-      //     option.value = account?.name || account["account name"];
-      //     option.textContent = account?.name || account["account name"];
-      //     option.dataset.maxValue = account?.maxDelay;
-      //     option.dataset.minValue = account?.minDelay;
-      //     option.dataset.link = account?.link;
-      //     option.dataset.comment = account?.comment;
-      //     optgroup.appendChild(option);
-      //   });
     accountListLoaded = true;
     enableButton(accountsBtn);
 
     updateStateOfDeleteBtn();
-
-    // const checkboxes = document.querySelectorAll("input[type=checkbox]");
-  
-    // checkboxes?.forEach(cb=> {
-    //   if (cb.dataset.typeof === 'activeAccounts') {
-    //     attachClickEventListner(cb, function(){
-    //       const selectedCheckboxes = Array.from(document.querySelectorAll('input[data-typeof="activeAccounts"]:checked'));
-    //       if (selectedCheckboxes.length > 0) {
-    //         enableButton(deleteAccountButton, 'block');
-    //         return;
-    //       }
-    //       disableButton(deleteAccountButton, 'block');
-    //     })
-    //   }
-    // });
-
-    // console.log('allAccounts', allAccounts);
-    // console.log('savedAccountsList', savedAccountsList);
   });
 
   attachClickEventListner(addAccountsBtn, function() {
-    
-    console.log('addAcBtnClicked', addAcBtnClicked);
     if (addAcBtnClicked) {
       const accounts = document.querySelectorAll('#addAcCheckboxWrap');
       accounts.forEach(el => {
@@ -473,15 +389,12 @@ async function startOpenLinks() {
       checkbox.classList.add('myinput', 'large');
 
       checkbox.textContent = account?.name || account["account name"];
-      // checkbox.dataset.maxValue = account?.maxValue;
-      // checkbox.dataset.minValue = account?.minValue;
       checkbox.dataset.link = account?.link;
       checkbox.dataset.comment = account?.comment;
       checkbox.dataset.typeof = 'availableAccounts';
 
       const label = document.createElement('label');
       label.textContent = `Account ${idx+1} - @${account['account name']}`;
-      // label.textContent = account['account name'];
       label.setAttribute('for', account['account name']);
       div.appendChild(checkbox);
       div.appendChild(label);
@@ -489,20 +402,6 @@ async function startOpenLinks() {
     });
 
     updateStateOfSaveBtn();
-    // const checkboxes = document.querySelectorAll("input[type=checkbox]");
-    // checkboxes?.forEach(cb=> {
-    //   if (cb.dataset.typeof === 'availableAccounts') {
-    //     attachClickEventListner(cb, function(){
-    //       const selectedCheckboxes = Array.from(document.querySelectorAll('input[data-typeof="availableAccounts"]:checked'));
-    //       if (selectedCheckboxes.length > 0) {
-    //         enableButton(saveAccountButton, 'block');
-    //         return;
-    //       }
-    //       disableButton(saveAccountButton, 'block');
-    //     })
-    //   }
-    // })
-
     addAcBtnClicked = !addAcBtnClicked;
   })
 
@@ -510,11 +409,6 @@ async function startOpenLinks() {
     
     const minDelay = parseInt(minDelayInput.value);
     const maxDelay = parseInt(maxDelayInput.value);
-
-    // if (accountName === "") {
-    //   alert("Please select an account.");
-    //   return;
-    // }
 
     if (isNaN(minDelay) || isNaN(maxDelay)) {
       alert("Please enter valid delay values.");
@@ -542,51 +436,9 @@ async function startOpenLinks() {
       alert('please select only one account at a time');
       return;
     }
-    // return;
-
-    // const selectElement = document.getElementById('accountAdd');
-    // const selectedOption = selectElement.options[selectElement.selectedIndex];
-    // const link = selectedOption.getAttribute('data-link') || '';
-    // const comment = selectedOption.getAttribute('data-comment') || '';
-    // var minDelay = parseInt(minDelayInput.value);
-    // var maxDelay = parseInt(maxDelayInput.value);
-
-    // if (accountName === "") {
-    //   alert("Please select an account.");
-    //   return;
-    // }
-
-    // if (isNaN(minDelay) || isNaN(maxDelay)) {
-    //   alert("Please enter valid delay values.");
-    //   return;
-    // }
-
-    // if (minDelay > maxDelay) {
-    //   alert("Minimum delay cannot be greater than maximum delay.");
-    //   return;
-    // }
 
     chrome.storage.local.get(["accounts"], function (result) {
       let accounts = [...result.accounts, ...selectedAccounts] || [];
-      console.log('accounts', accounts);
-      // return;
-      // var existingAccount = accounts.find(function (account) {
-      //   return account.name || account['account name'] === accountName;
-      // });
-
-      // if (existingAccount) {
-      //   alert("Account profile already exists.");
-      //   return;
-      // }
-
-      // accounts.push({
-      //   'account name': accountName,
-      //   minDelay: minDelay,
-      //   maxDelay: maxDelay,
-      //   link,
-      //   comment,
-      // });
-
 
       saveDataLocalStorage(
         "accounts",
@@ -597,28 +449,18 @@ async function startOpenLinks() {
       minDelayInput.value = "";
       maxDelayInput.value = "";
       displayMainPage();
-      // updateStateOfSaveBtn();
-      // disableButton(saveAccountButton, 'block');
-      // updateStateOfDeleteBtn();
       hideAccountsList();
-      // updateAccountSelect(accounts);
     });
   });
 
 
   attachClickEventListner(backButton, displayMainPage);
 
-  chrome.storage.local.get(["accounts"], function (result) {
-    var accounts = result.accounts || [];
-    updateAccountSelect(accounts);
-  });
-
   attachClickEventListner(deleteAccountButton, function () {
 
     // TODO: delete account based on account id,
     const selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
     const selectedValues = Array.from(selectedCheckboxes).map(checkbox => {
-      console.log(checkbox);
       if (checkbox.dataset.typeof === 'activeAccounts') {
         return {
           'account name': checkbox.value,
@@ -630,14 +472,12 @@ async function startOpenLinks() {
         }
       }
     }).filter(a=>a);
-    console.log(selectedValues);
 
     if (selectedValues?.length > 1) {
       alert("Please select one account account at a time.");
       return;
     }
     const accountName = selectedValues[0]?.['account name'];
-    console.log('accountName', accountName);
 
     chrome.storage.local.get(["accounts"], function (result) {
       const accounts = result.accounts || [];
@@ -663,120 +503,6 @@ async function startOpenLinks() {
     });
   });
 
-  async function updateAccountSelect(accounts) {
-    // accountSelect.innerHTML =
-    //   '<option disabled selected value="">Added Accounts</option>';
-    // accounts.forEach(function (account) {
-    //   // TODO: this functionality can be exported to a function
-    //   // it's repeatitive
-    //   const option = document.createElement("option");
-    //   option.value = account?.name || account["account name"];
-    //   option.textContent = account?.name || account["account name"];
-    //   option.dataset.maxValue = account?.maxDelay;
-    //   option.dataset.minValue = account?.minDelay;
-    //   option.dataset.link = account?.link;
-    //   option.dataset.comment = account?.comment;
-    //   accountSelect.appendChild(option);
-    // });
-  }
-
-  function displayAddedAccounts (accounts) {
-    console.log('accounts', accounts);
-    const html = `
-    <div id='activeAccounts'>
-      <h5>Active Accounts</h5>
-    </div>
-    `;
-
-    accountsListNode.insertAdjacentHTML('beforeend', html);
-
-    const dom = document.getElementById('activeAccounts');
-
-    if (accounts.length === 0) {
-      dom.insertAdjacentHTML('beforeend', '<p>No Active Accounts</p>')
-      return;
-    }
-
-    accounts.forEach((ac) => {
-      const el = document.createElement('span');
-      el.innerText = ac['account name'];
-      dom.appendChild(el);
-    })
-
-  }
-
-  async function addSelectedAccount(accounts, saveAccounts) {
-    // TODO: refactoring needs to be here
-
-    const uniqueUnsavedAccounts = Object.values(
-      accounts?.reduce((acc, obj) => {
-        const name = obj["account name"].trim();
-        if (!acc[name]) {
-          acc[name] = obj;
-        }
-        return acc;
-      }, {})
-    );
-
-    const unsavedAccounts = uniqueUnsavedAccounts.filter(
-      (item1) =>
-        !saveAccounts.some((item2) =>
-          compare(item1["account name"]?.trim(), item2['account name']?.trim())
-        )
-    );
-
-    // accountAdd.innerHTML = `<option disabled selected value="">Select an account</option>`;
-    // const optgroup = document.createElement("optgroup");
-    // optgroup.label = "----- Available Accounts ------";
-    // accountAdd.appendChild(optgroup);
-    // if (unsavedAccounts.length <= 0) {
-    //   const option = document.createElement("option");
-    //   option.textContent = "no accounts available";
-    //   option.disabled = true;
-    //   optgroup.appendChild(option);
-    // }
-    // if (unsavedAccounts.length > 0) {
-    //   unsavedAccounts.forEach(function (account) {
-    //     const option = document.createElement("option");
-    //     option.value = account?.name || account["account name"];
-    //     option.textContent = account?.name || account["account name"];
-    //     option.dataset.maxValue = account?.maxDelay;
-    //     option.dataset.minValue = account?.minDelay;
-    //     option.dataset.link = account?.link;
-    //     option.dataset.comment = account?.comment;
-    //     optgroup.appendChild(option);
-    //   });
-    // }
-
-    // if (saveAccounts.length <= 0) {
-    //   const optgroup = document.createElement("optgroup");
-    //   optgroup.label = "----- Added Accounts ------";
-    //   accountAdd.appendChild(optgroup);
-
-    //   const option = document.createElement("option");
-    //   option.textContent = "no accounts available";
-    //   option.disabled = true;
-    //   optgroup.appendChild(option);
-    // }
-
-    // if (saveAccounts.length > 0) {
-    //   const optgroup = document.createElement("optgroup");
-    //   optgroup.label = "----- Added Accounts ------";
-    //   accountAdd.appendChild(optgroup);
-
-    //   saveAccounts.forEach(function (account) {
-    //     const option = document.createElement("option");
-    //     option.value = account?.name || account["account name"];
-    //     option.textContent = account?.name || account["account name"];
-    //     option.dataset.maxValue = account?.maxDelay;
-    //     option.dataset.minValue = account?.minDelay;
-    //     option.dataset.link = account?.link;
-    //     option.dataset.comment = account?.comment;
-    //     optgroup.appendChild(option);
-    //   });
-    // }
-  }
-  
   async function updateLinkFromApi(url, savedData) {
     const { data } = await getAccounts(url);
     data?.shift();
@@ -854,7 +580,6 @@ async function startOpenLinks() {
   }
 
   function hideAccountsList() {
-    // if (accountListLoaded) {
       const {
         activeAcTitle,
         activeAcIcon,
@@ -881,9 +606,6 @@ async function startOpenLinks() {
 
       accountListLoaded = false;
       enableButton(accountsBtn);
-
-      // return;
-    // }
   }
 
   function updateStateOfDeleteBtn() {
