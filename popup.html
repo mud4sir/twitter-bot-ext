@@ -1,187 +1,359 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <title>GrowthTwitter Reply Bot</title>
+    <style>
+      *,
+      *:after,
+      *:before {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: transparent;
+      }
 
-<head>
-  <title>Twitter Commentor</title>
-  <style>
-    *,
-    *:after,
-    *:before {
-      box-sizing: border-box;
+      label {
+        font-size: 15px;
+      }
+
+      a {
+        color: 413F3F;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      .account-form {
+        display: none;
+      }
+
+      .twitter-ext-connect {
+        /* padding: 10px; */
+        /* background: linear-gradient(to bottom, #1da1f2, #1877f2); */
+        background-color: #F1F2F8;
+        /* color: #F1F2F8; */
+        width: 420px;
+      }
+
+      .twitter-ext {
+        display: none;
+        /* padding: 10px; */
+        /* background: linear-gradient(to bottom, #1da1f2, #1877f2); */
+        /* color: #F1F2F8; */
+        background-color: #F1F2F8;
+        width: 420px;
+      }
+
+      .twitter-ext h3,
+      .twitter-ext-connect h3 {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.25;
+        color: #F1F2F8;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 15px;
+      }
+
+      .form-group span {
+        color: #5041FF;
+      }
+
+      .twitter-ext label,
+      .twitter-ext-connect label {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0 0 10px 0;
+        padding: 2px;
+      }
+      .twitter-ext select,
+      .twitter-ext input,
+      .twitter-ext-connect input {
+        border: 2px solid gainsboro;
+        padding: 12px;
+        font-size: 14px;
+        border-radius: 5px;
+        background-color: #fff;
+        /* color: #fff; */
+        outline: none !important;
+        /* width: 70%; */
+        margin-top: -12px;
+      }
+      .twitter-ext input::placeholder {
+        color: #fff;
+      }
+      .twitter-ext select * {
+        color: #000;
+        padding: 5px;
+      }
+      .twitter-ext .button,
+      .twitter-ext-connect .button {
+        /* 
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 25px;
+        padding: 10px 15px;
+        background-color: rgb(0, 0, 0, 0.8);
+        text-align: center;
+        line-height: 1;
+        outline: none;
+        box-shadow: none;
+        display: inline-flex;
+        align-items: center;
+        border: none;
+        cursor: pointer;
+        min-width: 110px;
+        text-align: center;
+        justify-content: center; */
+
+        font-size: 14px;
+        font-weight: 600;
+        background-color: #413F3F;
+        color: #F1F2F8;
+        text-transform: uppercase;
+        padding: 8px 10px;
+        border: none;
+        cursor: pointer;
+        min-width: 100px;
+        margin-top: 10px;
+      }
+      #backMainPageBtn {
+        display: none;
+      }
+      .d-flex {
+        display: flex;
+      }
+      .between {
+        justify-content: space-between;
+      }
+      .v-center {
+        align-items: center;
+      }
+      .flex-wrap {
+        flex-wrap: wrap;
+      }
+      .gap-15 {
+        gap: 15px;
+      }
+      .d-none {
+        display: none !important;
+      }
+      .w-full {
+        width: 100%;
+      }
+
+      .title {
+        background: #000;
+        text-align: center;
+        border-bottom: 5px solid #5041FF;
+        padding: 12px;
+      }
+
+      .content-wrap {
+        padding: 20px;
+      }
+
+      .api-content {
+        padding-left: 20px;
+      }
+       
+      .btn {    
+        font-weight: 600;
+        font-size: 24px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        line-height: 2;
+        color: #413F3F;
+      }
+
+      .btn span img {
+        margin-right: 5px;
+      }
+
+      .clr-primary {
+        color: #5041FF;
+      }
+
+      .txt-medium {
+        font-size:medium;
+      }
+      .pad-l {
+        padding-left: 5px;
+      }
+
+      .pad-r {
+        padding-right: 5px;
+      }
+
+      .pad-t {
+        padding-top: 20px;
+      }
+
+      .txt-black {
+        color: #413F3F;
+      }
+
+      .txt-title {
+        font-size: 25px;
+        font-weight: 600;
+      }
+
+      .mngmnt-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 50px;
+      }
+
+      .w-70 {
+        width: 70%;
+      }
+
+      .bold {
+        font-weight: 700;
+      }
+
+      .btn-accounts {
+        width: 320px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .btn-accounts .span {
+        padding: 0;
+        margin: 0;
+      }
+
+      .btn-accounts>.span {
+        height: 25px;
+      }
+
+      .btn-accounts .total-accounts {
+        background-color: #413F3F;
+        color: #F1F2F8;
+        margin: 0;
+        border-radius: 8px;
+        width: 25px;
+        height: 25px;
+        flex: 0 0 25px;
+        font-weight: 400;
+        font-size: 14px;
+        padding: 0;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      hr {  
+        height: 2px;
+        color: black;
+        width: 100%;
+      }
+
+      #accountList li {
+        list-style: none;
+        display: flex;
+        align-items: center;
+      }
+
+      #accountList {
+        display: flex;
+        flex-direction: column;
+        align-content: center;
+        justify-content: center;
+        margin-bottom: 30px;
+        width: 80%;
+      }
+
+      #activeAccountsTitle {
+        color: #413F3F;
+        font-size: medium;
+      }
+
+      #activeAccountsWrapper {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+       }
+
+      /* input */
+      /* Main Classes */
+      .myinput[type="checkbox"]:before{
+          position: relative;
+          display: block;
+          width: 11px;
+          height: 11px;
+          border: 1px solid #808080;
+          content: "";
+          background: #FFF;
+      }
+      .myinput[type="checkbox"]:after{
+          position: relative;
+          display: block;
+          left: 2px;
+          top: -11px;
+          width: 7px;
+          height: 7px;
+          border-width: 1px;
+          border-style: solid;
+          border-color: #B3B3B3 #dcddde #dcddde #B3B3B3;
+          content: "";
+          background-image: linear-gradient(135deg, #B1B6BE 0%,#FFF 100%);
+          background-repeat: no-repeat;
+          background-position:center;
+      }
+      .myinput[type="checkbox"]:checked:after{
+          background-image:  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAQAAABuW59YAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAAB2SURBVHjaAGkAlv8A3QDyAP0A/QD+Dam3W+kCAAD8APYAAgTVZaZCGwwA5wr0AvcA+Dh+7UX/x24AqK3Wg/8nt6w4/5q71wAAVP9g/7rTXf9n/+9N+AAAtpJa/zf/S//DhP8H/wAA4gzWj2P4lsf0JP0A/wADAHB0Ngka6UmKAAAAAElFTkSuQmCC'), linear-gradient(135deg, #B1B6BE 0%,#FFF 100%);
+      }
+      .myinput[type="checkbox"]:disabled:after{
+          -webkit-filter: opacity(0.4);
+      }
+      .myinput[type="checkbox"]:not(:disabled):checked:hover:after{
+          background-image:  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAQAAABuW59YAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAAB2SURBVHjaAGkAlv8A3QDyAP0A/QD+Dam3W+kCAAD8APYAAgTVZaZCGwwA5wr0AvcA+Dh+7UX/x24AqK3Wg/8nt6w4/5q71wAAVP9g/7rTXf9n/+9N+AAAtpJa/zf/S//DhP8H/wAA4gzWj2P4lsf0JP0A/wADAHB0Ngka6UmKAAAAAElFTkSuQmCC'), linear-gradient(135deg, #8BB0C2 0%,#FFF 100%);
+      }
+      .myinput[type="checkbox"]:not(:disabled):hover:after{
+          background-image: linear-gradient(135deg, #8BB0C2 0%,#FFF 100%);  
+          border-color: #85A9BB #92C2DA #92C2DA #85A9BB;  
+      }
+      .myinput[type="checkbox"]:not(:disabled):hover:before{
+          border-color: #3D7591;
+      }
+      /* Large checkboxes */
+      .myinput.large{
+          height:22px;
+          width: 22px;
+      }
+
+      .myinput.large[type="checkbox"]:before{
+          width: 20px;
+          height: 20px;
+      }
+      .myinput.large[type="checkbox"]:after{
+          top: -18px;
+          width: 16px;
+          height: 16px;
+      }
+      .span-label {
+        flex: 1 0 auto;
+      }
+
+
+    .checkbox-wrap {
+      display: block;
+      margin-bottom: 17px;
     }
 
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: transparent;
-    }
-
-    label {
-      font-size: 15px;
-    }
-
-    a {
-      color: white;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-
-    .account-form {
-      display: none;
-    }
-
-    .twitter-ext-wrap {
-      background: #F1F2F8;
-      ;
-      color: white;
-      width: 400px;
-    }
-
-    .twitter-ext-wrap h3 {
-      padding: 10px;
-      font-size: 18px;
-      line-height: 1.25;
-      background-color: #000;
-      text-align: center;
-      border-bottom: 4px solid blue;
-      margin: 0;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      margin-bottom: 15px;
-    }
-
-    .twitter-ext-wrap label {
-      font-size: 14px;
-      font-weight: 600;
-      margin: 0 0 10px 0;
-    }
-
-    .twitter-ext-wrap select,
-    .twitter-ext-wrap input {
-      outline: none !important;
-      width: 100%;
-      padding: 7px 20px;
-      background: #F9F9F9;
-      border: 1px solid #000000;
-      border-radius: 5px;
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 1.25;
-      text-align: center;
-      color: #413F3F;
-    }
-
-    .twitter-ext-wrap input::placeholder {
-      color: #413F3F;
-    }
-
-    .twitter-ext-wrap select * {
-      color: #000;
-      padding: 5px;
-    }
-
-    .twitter-ext-wrap button {
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 0;
-      padding: 10px 15px;
-      background-color: #413F3F;
-      color: #fff;
-      text-align: center;
-      line-height: 1;
-      outline: none;
-      box-shadow: none;
-      display: inline-flex;
-      align-items: center;
-      border: none;
-      cursor: pointer;
-      min-width: 110px;
-      text-align: center;
-      justify-content: center;
-    }
-
-    #backMainPageBtn {
-      display: none;
-    }
-
-    .d-flex {
-      display: flex;
-    }
-
-    .between {
-      justify-content: space-between;
-    }
-
-    .v-center {
-      align-items: center;
-    }
-
-    .flex-wrap {
-      flex-wrap: wrap;
-    }
-
-    .gap-15 {
-      gap: 15px;
-    }
-
-    .d-none {
-      display: none;
-    }
-
-    .twitter-ext-wrap h4 {
-      font-weight: 700;
-      font-size: 22px;
-      line-height: 1.3;
-      color: #413F3F;
-      margin: 0 0 15px 0;
-    }
-    .twitter-ext-body {
-      padding: 10px;
-    }
-
-    .min-max {
-      max-width: 100px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    input + input {
-      margin-top: 10px;
-    }
-    .accordion {
-      border: none;
-      margin-top: 15px;
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-    
-    .accordion-header {
-      background-color: transparent;
-      padding: 0;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 14px;
-      font-weight: 700;
-      color: #413F3F;
-      border: none;
-    }
-    
-    .accordion-content {
-      padding: 10px;
-      color: #413F3F;
-    }
-
-    .checkbox + .checkbox {
-      margin-top: 10px;
-    }
-
-    .checkbox input {
+    .checkbox-wrap input {
       padding: 0;
       height: initial;
       width: initial;
@@ -190,137 +362,223 @@
       cursor: pointer;
     }
 
-    .checkbox label {
+    .checkbox-wrap label {
       position: relative;
       cursor: pointer;
-      font-size: 14px;
-      color: #413F3F;
-      font-weight: normal;
     }
 
-    .checkbox label:before {
-      content:'';
-      -webkit-appearance: none;
-      background-color: transparent;
-      border: 2px solid #C4C4C4;
-      box-shadow: none;
-      padding: 0;
-      width: 15px;
-      height: 15px;
-      display: inline-block;
-      position: relative;
-      vertical-align: middle;
-      cursor: pointer;
-      margin-right: 5px;
-      border-radius: 5px;
+    .checkbox-wrap label:before {
+        content: '';
+        -webkit-appearance: none;
+        background-color: transparent;
+        border: 2px solid #a9a1a1;
+        padding: 6px;
+        display: inline-block;
+        position: relative;
+        vertical-align: middle;
+        cursor: pointer;
+        margin-right: 5px;
+        border-radius: 3px;
     }
 
-    .checkbox input:checked + label:after {
+    .checkbox-wrap input:checked + label:after {
       content: '';
-      display: block;
-      position: absolute;
-      top: 4px;
-      left: 6px;
-      width: 5px;
-      height: 9px;
-      border: solid #413F3F;
-      border-width: 0 2px 2px 0;
-      transform: rotate(45deg);
+        display: block;
+        position: absolute;
+        top: 4px;
+        left: 8px;
+        width: 5px;
+        height: 11px;
+        border: solid #a9a1a1;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
     }
-    .tag {
-      padding: 3px;
-      border-radius: 4px;
-      color: #fff;
-      font-size: 12px;
-      line-height: 1;
-      background-color: #413F3F;
+    #checkboxWrapContainer {
+      margin-bottom: 16px;
     }
-  </style>
-  <script src="popup.js"></script>
-</head>
 
-<body>
-  <div class="twitter-ext-wrap">
-    <div class="twitter-ext" id="connectionPage">
-      <h3>GrowthTwitter Reply Bot</h3>
-      <div class="twitter-ext-body">
-        <div class="d-flex">
-          <h4>API Sheet</h4>
-        </div>
-        <input id="linkToSheet" type="text" placeholder="paste link to your sheet here" />
-        <div class="d-flex between">
-          <button id="connectSheetBtn">Save</button>
-          <button id="backMainPageBtn">&lt; main page</button>
-        </div>
-      </div>
-    </div>
+    #addAcCheckboxWrapContainer {
+      margin-top: 14px;
+    }
 
-    <div class="twitter-ext" id="mainPage">
-      <h3>Twitter Commentor</h3>
-      <div class="twitter-ext-body">
-        <div class="d-flex">
-          <h4>API Sheet</h4>
-        </div>
-        <div class="form-group">
-          <select id="accountSelect">
-            <option value="">Select Account</option>
-          </select>
-        </div>
-        <div class="d-flex between flex-wrap gap-15">
-          <button id="getDataButton">Start</button>
-          <button id="enterDelayBtn" class="delay-btn">Enter Delay</button>
-          <div id="delayBtnMain" class="d-none form-group min-max">
-            <input type="number" id="minDelayMain" min="1" placeholder="Min seconds" required />
-            <input type="number" id="maxDelayMain" min="1" placeholder="Max seconds" required />
-          </div>
-          <button id="accountMgtButton">Acc Mgt.</button>
-          <button id="connectionBtn">Change Api</button>
-        </div>
+    .loading {
+      cursor: progress !important;
+    }
 
-        <div class="account-form">
-          <div class="form-group">
-            <select id="accountAdd">
-              <option value="" disabled selected>Select Account</option>
-            </select>
-          </div>
-          <div class="form-group min-max">
-            <input type="number" id="minDelay" min="1" placeholder="Min seconds" required />
-            <input type="number" id="maxDelay" min="1" placeholder="Max seconds" required />
-          </div>
-          <div class="d-flex between v-center">
-            <button id="saveAccountButton">Save</button>
-            <button class="deleteAccountButton" id="deleteAccountButton">
-              Delete
-            </button>
+    .block {
+      cursor: not-allowed !important;
+      background: #ccc !important;
+      color: #413F3F !important;
+    }
+
+    </style>
+    <script src="popup.js" defer></script>
+  </head>
+  <body>
+    <div>
+      <div class="twitter-ext-connect" id="connectionPage">
+        <div class="title">
+          <h3>GrowthTwitter Reply Bot</h3>
+        </div>
+        
+        <div class="content-wrap">     
+          <div class="api-content">
+            <p class="txt-black txt-title">
+              <span>
+                <img src="./icons/wifi.png" width="20px" height="18px" title="wifi icon"/>
+              </span>
+              Sheet API
+            </p>
+            <input
+              id="linkToSheet"
+              type="text"
+              placeholder="API LINK"
+              class="w-70"
+            />
           </div>
           <br />
-          <div class="d-flex between v-center">
-            <button class="back-button" id="backButton">&lt; Back</button>
-          </div>
-        </div>
-
-        <div class="accordion">
-          <div class="accordion-header" id="accordion">
-            Section 1
-            <span class="tag">3</span>
-          </div>
-          <div class="accordion-content">
-            <div class="checkbox">
-              <input type="checkbox" id="html">
-              <label for="html">HTML</label>
-            </div>
-            <div class="checkbox">
-              <input type="checkbox" id="css">
-              <label for="css">CSS</label>
-            </div>
-            <div class="checkbox">
-              <input type="checkbox" id="js">
-              <label for="js">JS</label>
-            </div>
+          <br />
+          <div>
+            <button id="connectSheetBtn" class="primary-btn button">Save</button>
+            <button id="backMainPageBtn" class="primary-btn button">&lt; Back</button>
           </div>
         </div>
       </div>
+
+      <div class="twitter-ext" id="mainPage">
+        <div class="title">
+          <h3>GrowthTwitter Reply Bot</h3>
+        </div>
+
+        <div class="content-wrap">
+          <p class="txt-black txt-title" id="accountManagementTitle">
+            <span>
+              <img src="./icons/folder.png" width="18px" height="18px" title="wifi icon"/>
+            </span>
+            Account Management
+          </p>
+          <div class="form-group">
+            <!-- <select id="accountSelect">
+              <option value="">Select Account</option>
+            </select> -->
+            <div class="d-flex between v-center w-full">
+              <button id="accountMgtButton" class="btn">
+                <span>
+                  <img src="./icons/folder.png" width="18px" height="18px" title="folder icon"/>
+                </span>
+                Account Management
+              </button>
+              <span id ='totalAccounts'>_ accounts</span>
+            </div>
+            <div>
+              <button class="btn" id="connectionBtn">
+                <span>
+                  <img src="./icons/wifi.png" width="20px" height="18px" title="wifi icon"/>
+                </span>
+                Sheet API</button>
+            </div>
+          </div>
+          <div>
+            <button id="getDataButton" class="btn clr-primary txt-medium">Start Now</button>
+            <!-- <button id="enterDelayBtn" class="delay-btn">Enter Delay</button> -->
+            <!-- <div id="delayBtnMain" class="d-none">
+              <label for="minDelayMain">Min:</label>
+              <input
+                type="number"
+                id="minDelayMain"
+                min="1"
+                placeholder="Min seconds"
+                required
+              />
+              <label for="maxDelayMain">Max:</label>
+              <input
+                type="number"
+                id="maxDelayMain"
+                min="1"
+                placeholder="Max seconds"
+                required
+              />
+            </div> -->
+            <!-- <button id="accountMgtButton">Acc Mgt.</button> -->
+            <!-- <button id="connectionBtn">Change Api</button> -->
+            <h4 id="processStatus" class="clr-primary txt-medium pad-l pad-t">Stopped</h4>
+          </div>
+
+          <div class="account-form">
+            <div class="mngmnt-wrap">
+              <div class="form-group">
+                <!-- <select id="accountAdd">
+                  <option value="" disabled selected>Select Account</option>
+                </select> -->
+                <button id="accountsBtn" class="txt-medium bold txt-black btn d-flex btn-accounts">
+                  <span class="span">
+                    <img src="./icons/folder2.png"  title="folder icon"/>
+                  </span>
+                  <span class="span-label">
+                    Accounts
+                  </span>
+                  <hr />
+                  <img src="./icons/down.png" title="down symbol" />
+                  <span class="total-accounts" id="totalAccCount">
+                    9
+                  </span>
+                </button>
+              </div>
+              <div id="accountList">
+                <div id="checkboxWrapContainer">
+
+                </div>
+                <button id="addAccountsBtn" class="txt-medium bold txt-black btn btn-accounts d-none">
+                  <span class="span">
+                    <img src="./icons/folder2.png"  title="folder icon"/>
+                  </span>
+                  <span class="span-label">
+                    Add Accounts
+                  </span>
+                  <hr />
+                  <img src="./icons/down.png" title="down symbol" />
+                  <span class="total-accounts" id="addedAccCount">
+                    9
+                  </span>
+                </button>
+                <div id="addAcCheckboxWrapContainer">
+
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="minDelay">Min Delay</label>
+                <input
+                  type="number"
+                  id="minDelay"
+                  min="1"
+                  placeholder="Min Delay"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="maxDelay">Max Delay</label>
+                <input
+                  type="number"
+                  id="maxDelay"
+                  min="1"
+                  required
+                />
+              </div>
+            </div>
+            <div class="d-flex between v-center">
+              <button id="saveAccountButton" class="button block" disabled= 'true'>Save</button>
+              <button class="deleteAccountButton button block" id="deleteAccountButton" disabled= 'true'>
+                Delete
+              </button>
+            </div>
+            <br />
+            <div class="d-flex between v-center">
+              <button class="back-button button" id="backButton">&lt; Back</button>
+            </div>
+          </div>
+          <div id='accountsList'></div>
+        </div>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>
