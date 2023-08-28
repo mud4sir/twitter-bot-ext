@@ -17,6 +17,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     const apiKeyLocalStorage = await result[`${windowId}`];
     accountsUrl = apiKeyLocalStorage;
     if (apiKeyLocalStorage && apiKeyLocalStorage?.trim() !== "") {
+      const accountMgtButton = document.getElementById("accountMgtButton");
+      disableButton(accountMgtButton);
       displayMainPage();
       const response = await fetch(apiKeyLocalStorage);
       data = await response.json();
@@ -24,6 +26,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       allAcc.shift();
       allAccounts = allAcc;
       document.getElementById('totalAccounts').textContent = `${allAccounts.length} accounts`;
+      enableButton(accountMgtButton);
     }
   });
 
